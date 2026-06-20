@@ -27,7 +27,7 @@ class DictationApp:
 
     def _start(self):
         with self._lock:
-            if self.machine.is_recording:
+            if self._stream is not None:  # 已在录音，防重入
                 return
             self._frames = []
             self._stream = record_into(self._frames, self.cfg.sample_rate)
