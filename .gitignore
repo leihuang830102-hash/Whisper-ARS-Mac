@@ -13,3 +13,9 @@ phase0/raw_transcripts/
 # 本地环境
 .env
 .env.local
+
+# Python
+.venv/
+__pycache__/
+*.egg-info/
+*.egg-link
