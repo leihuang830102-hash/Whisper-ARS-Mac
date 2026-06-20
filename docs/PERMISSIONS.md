@@ -11,8 +11,10 @@
 
 ## 操作步骤
 1. 打开 系统设置 → 隐私与安全性。
-2. 依次进入「麦克风」「辅助功能」「输入监听」，把你用来运行 `python` 的终端 app 打勾（点 `+` 添加）。
-3. **重启该终端**（权限变更对已运行进程不生效，必须重启进程）。
+2. 依次进入「麦克风」「辅助功能」「输入监听」，把**你实际跑 `python` 的那个程序**打勾。
+   - ⚠️ 注意：`python -m whisper_dictation.app` 里的 `whisper_dictation.app` 是 **Python 模块路径**，不是要授权的对象。要授权的是**宿主程序**：在 VS Code 终端跑→给 `Visual Studio Code`；在 Trae CN 跑→给 `Trae CN`；Terminal→`Terminal`；iTerm→`iTerm`。
+   - 判断方法：`echo $__CFBundleIdentifier`（如 `cn.trae.app` 即 Trae CN）。
+3. **完全退出该程序再重开**（权限变更对已运行进程不生效——重启终端面板不够，要重启整个宿主 app）。
 
 ## 为什么必须授权
 - 不授麦克风 → `sounddevice` 打不开输入流，录音失败。
