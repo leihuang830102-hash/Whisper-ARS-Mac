@@ -19,9 +19,12 @@ def _new_pasteboard():
 
 
 def _post_key(mods_flags: int, key_code: int, down: bool) -> None:
-    """构造并发送一个键盘事件。"""
+    """构造并发送一个键盘事件。
+
+    pyobjc 里 CGEvent 没有 setFlags 方法，要用 CGEventSetFlags(event, flags) 函数。
+    """
     event = Quartz.CGEventCreateKeyboardEvent(None, key_code, down)
-    event.setFlags(mods_flags)
+    Quartz.CGEventSetFlags(event, mods_flags)
     Quartz.CGEventPost(Quartz.kCGHIDEventTap, event)
 
 
