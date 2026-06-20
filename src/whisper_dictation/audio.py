@@ -39,3 +39,12 @@ def flatten(frames: list) -> np.ndarray:
     if not frames:
         return np.zeros(0, dtype=np.float32)
     return np.concatenate(frames).astype(np.float32)
+
+
+def should_transcribe(audio: "np.ndarray", sample_rate: int = 16000,
+                      min_rms: float = 0.005, min_seconds: float = 0.25) -> bool:
+    """静音/过短的音频不送模型，避免 Whisper 静音幻觉（见 LESSONS_LEARNED #3）。"""
+    if audio.size < int(sample_rate * min_seconds):
+        return False
+    rms = float(np.sqrt(np.mean(np.square(audio))))
+    return rms >= min_rms
