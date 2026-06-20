@@ -1,7 +1,7 @@
 # 听写工具配置
 mode: ptt                # ptt=按住说话 | toggle=按一下开始/再按一下结束
 hotkey: cmd+space        # 全局热键（修饰键+按键，+ 分隔）
-model: mlx-community/whisper-large-v3-turbo   # mlx-whisper 模型（HF id）
+model: models/whisper-large-v3-turbo          # 本地模型目录（mlx-whisper 检测到目录存在则跳过 HF 下载）。国内用 scripts/download_model.py 从 ModelScope 拉
 language: zh             # 中文为主
 sample_rate: 16000
 silence_threshold: 0.01

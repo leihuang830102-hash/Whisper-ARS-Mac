@@ -5,6 +5,7 @@
 *.mlmodel
 *.gguf
 *whisper*turbo*
+models/
 
 # 录音/转写中间产物
 phase0/recordings/
