@@ -51,27 +51,27 @@ cat > "$APP_DIR/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-# 启动器脚本：进项目目录，用 venv python 跑 app，输出重定向到日志文件（.app 无终端）
+# 启动器脚本：双击 → 打开 Terminal 运行听写。
+# 关键：复用 Terminal 已有的 麦克风/辅助功能/输入监听 权限，.app 自身无需授权、听写代码不改。
 cat > "$APP_DIR/Contents/MacOS/launch" <<LAUNCH
 #!/bin/bash
-# 薄壳启动器：由 .app 调用，指向项目 venv 运行听写服务。
-export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/miniconda3/bin:\$PATH"
-cd "$PROJECT_DIR" || exit 11
-mkdir -p "\$(dirname "$LOG_FILE")"
-exec "$VENV_PYTHON" -m whisper_dictation.app >> "$LOG_FILE" 2>&1
+# .app 薄壳：只负责在 Terminal 里跑听写命令，然后自身退出。
+# osascript 单引号串里用双引号包住 do script 的 shell 命令；\$PROJECT_DIR 已在构建时展开为字面路径。
+osascript -e 'tell application "Terminal" to activate' \
+          -e 'tell application "Terminal" to do script "cd $PROJECT_DIR && source .venv/bin/activate && exec python -m whisper_dictation.app"'
+exit 0
 LAUNCH
 chmod +x "$APP_DIR/Contents/MacOS/launch"
 
-# ---- ad-hoc 签名（个人使用无需公证；签名后 TCC 权限才能稳定挂到 .app）----
+# ---- ad-hoc 签名（让 .app 被 macOS 识别为合法 app；本 .app 不需 TCC 权限，签名仅求干净）----
 echo "ad-hoc 签名…"
-codesign --force --deep --sign - "$APP_DIR" >/dev/null 2>&1 || echo "⚠️ codesign 警告（可能影响权限，注意测试）"
+codesign --force --deep --sign - "$APP_DIR" >/dev/null 2>&1 || echo "⚠️ codesign 警告（不影响功能）"
 
 echo
 echo "✅ 完成：$APP_DIR"
 echo
 echo "下一步："
-echo "  1. 在 Finder 里打开 $OUT_ROOT ，双击 $APP_NAME 。"
-echo "  2. 系统设置 → 隐私与安全性，给 'Whisper Dictation' 授："
-echo "     - 辅助功能  - 输入监听  - 麦克风（首次录音会弹窗）"
-echo "  3. 日志：tail -f $LOG_FILE"
-echo "  4. 退出：Dock 里右键 Whisper Dictation → 退出；或 pkill -f whisper_dictation.app"
+echo "  1. Finder 打开 $OUT_ROOT ，双击 $APP_NAME —— 会弹出一个 Terminal 窗口跑听写。"
+echo "  2. 无需再授权（复用 Terminal 已有权限）。看到 '听写就绪…' 即可。"
+echo "  3. 退出：那个 Terminal 窗口里 Ctrl-C，或 pkill -f whisper_dictation.app"
+echo "  注意：项目目录不能移动/删除（.app 依赖它）。"
