@@ -27,6 +27,18 @@
 - **修复**：mock 方法改为 `read(self, n) -> (fake, False)`。
 - **预防规则**：写 mock 前先 `inspect.signature` 或查真实 API 签名，别凭记忆。
 
+### 5. macOS 全局热键必须在"责任进程"已授权的终端里跑
+- **现象**：从 Trae CN（IDE）里经 Claude Code 跑 `python -m whisper_dictation.app`，pynput listener `running=True` 但 **0 事件**；按热键无反应。
+- **根因**：macOS TCC 权限按"责任进程"判定。授给主 app（`cn.trae.app`）的 辅助功能/输入监听 **不覆盖** 其 Helper 子进程（`cn.trae.app.helper`），而 python 实际跑在 Helper 下；且 miniconda 的 python 是未签名二进制，更难授权。
+- **修复**：用**独立签名终端**（Terminal.app / iTerm）跑，授给它三项权限，重启后生效。责任进程 = 终端 app，授权可靠。
+- **预防规则**：涉及全局键鼠监听/CGEvent 的 macOS 工具，永远从已授权的**独立终端**或打包成 **.app** 运行，别指望从 IDE/插件进程内继承权限。
+- **诊断方法**：跑 10s pynput Listener 打印每个按键；若 `running=True` 但 0 输出 → 权限没到责任进程。
+
+### 6. fn 键 pynput 收不到；cmd+space 与 Spotlight 冲突
+- **现象**：`fn+space` 不可行（`pynput.keyboard.Key` 无 fn 成员，fn 被系统底层拦截）。`cmd+space` 被 Spotlight 抢走。
+- **修复**：改用 `control+f5`（pynput 支持 f1-f20）。需在 系统设置→键盘→功能键 开启"将 F1、F2 等用作标准功能键"，否则顶排 F 键默认是多媒体键。
+- **预防规则**：选全局热键前先 `pynput.keyboard.Key` 枚举确认键存在，并避开系统保留组合。
+
 ## 流程
 
 - 从"用现成 app"转向"自研"（因 SuperWhisper 付费），决策应及时记进 spec，否则计划与现实脱节。

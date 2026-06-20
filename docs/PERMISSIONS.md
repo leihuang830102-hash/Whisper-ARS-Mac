@@ -16,6 +16,24 @@
    - 判断方法：`echo $__CFBundleIdentifier`（如 `cn.trae.app` 即 Trae CN）。
 3. **完全退出该程序再重开**（权限变更对已运行进程不生效——重启终端面板不够，要重启整个宿主 app）。
 
+## ⚠️ 重要：必须在"责任进程"已授权的终端里跑
+macOS TCC 权限按**责任进程**判定。授给某个 IDE（如 `cn.trae.app`）的 辅助功能/输入监听
+**不覆盖**它的 Helper 子进程（如 `cn.trae.app.helper`）——而从 IDE 内部经插件跑 python 时，
+进程实际挂在 Helper 下，导致 pynput 监听器 `running=True` 却收不到任何按键（0 事件）。
+加上 python（miniconda/homebrew）多为未签名二进制，更难授权。
+
+**可靠做法**：用**独立签名终端**（Terminal.app 或 iTerm）跑：
+1. 打开 系统设置 → 隐私与安全性。
+2. 给 **Terminal**（或 iTerm）勾上：麦克风、辅助功能、输入监听（列表没有就 `+` 添加）。
+3. **Cmd+Q 完全退出** Terminal 再重开。
+4. 在 Terminal 里运行：
+   ```bash
+   cd /Users/lei/AI_Projects/Whisper && source .venv/bin/activate && python -m whisper_dictation.app
+   ```
+   留着这个 Terminal 窗口（看状态），切到任意文本框按热键测试。
+
+**诊断**：若按热键无反应，跑 10s 键盘诊断——`running=True` 但 0 事件 → 权限没到责任进程。
+
 ## 为什么必须授权
 - 不授麦克风 → `sounddevice` 打不开输入流，录音失败。
 - 不授辅助功能 → pynput 收不到全局按键、CGEvent 模拟的 Cmd+V 无效。
