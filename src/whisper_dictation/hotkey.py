@@ -60,6 +60,10 @@ def _target_key_for(name: str):
     n = name.lower()
     if n in _SPECIAL_KEYS:
         return _SPECIAL_KEYS[n]
+    # F 键 f1..f20 → keyboard.Key.f1..f20（pynput 全支持）
+    import re
+    if re.fullmatch(r"f([1-9]|1\d|20)", n):
+        return getattr(keyboard.Key, n)
     # 单个字母/数字键 → KeyCode
     if len(n) == 1 and n.isalnum():
         return keyboard.KeyCode.from_char(n)

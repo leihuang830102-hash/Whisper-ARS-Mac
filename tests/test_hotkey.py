@@ -1,4 +1,6 @@
-from whisper_dictation.hotkey import Mode, ModeMachine
+from pynput import keyboard
+
+from whisper_dictation.hotkey import Mode, ModeMachine, _target_key_for
 
 
 def test_ptt_press_starts_release_stops():
@@ -22,3 +24,12 @@ def test_toggle_release_is_noop():
     assert m.on_press() == "start"
     assert m.on_release() == "noop"    # toggle 模式下松开无动作
     assert m.is_recording
+
+
+def test_target_key_for_f5():
+    assert _target_key_for("f5") == keyboard.Key.f5
+
+
+def test_target_key_for_letter_and_space():
+    assert _target_key_for("j") == keyboard.KeyCode.from_char("j")
+    assert _target_key_for("space") == keyboard.Key.space
