@@ -4,6 +4,8 @@ macOS 本地语音听写：全局热键说话 → **Whisper Large v3 Turbo（mlx
 
 实测在 Apple M5 上：整句转写 ~0.8s，中英文准确率高。
 
+> License: MIT（见 [LICENSE](LICENSE)）。本项目不分发下列第三方依赖与模型——用户自行通过 pip 安装依赖、通过 `scripts/download_model.py` 下载模型。各依赖保留其原始 license。
+
 ## 它能做什么
 - 按住热键说话，松开 → 转写文字粘到**任意**文本框的光标处（聊天框、编辑器、浏览器、终端…）。
 - 两种触发模式：`ptt`（按住说话）/ `toggle`（按一下开始，再按一下结束）。
@@ -83,3 +85,20 @@ scripts/
 - **Phase B**：转写后过本地 LLM（Ollama）清理——仅当实测原始 Turbo 输出不够好（目前整句已很好，暂不需要）。
 - **Phase C**：ASR 生态功能调研（说话人区分、语音命令等）。
 - **Phase D**：自然语言语音对话（流式 ASR + TTS，像打电话）。
+
+## 致谢与第三方依赖（Credits）
+
+本项目（MIT）使用/基于下列开源软件与模型（按各自原始 license；本项目不重新分发它们，用户自行安装/下载）：
+
+| 依赖 / 模型 | 用途 | License |
+|---|---|---|
+| [OpenAI Whisper Large v3 Turbo](https://github.com/openai/whisper) | 语音识别模型权重 | MIT |
+| [mlx-whisper](https://github.com/ml-explore/mlx-examples) / [MLX](https://github.com/ml-explore/mlx) | Apple Silicon 上的 Whisper 推理引擎 | MIT / Apache-2.0 |
+| [pynput](https://github.com/moses-palmer/pynput) | 全局热键监听 | **LGPL-3.0-or-later**（可独立替换的库） |
+| [pyobjc](https://pyobjc.readthedocs.io/) (Quartz / AppKit) | macOS 剪贴板 + 模拟键盘输入 | MIT |
+| [sounddevice](https://python-sounddevice.readthedocs.io/) / [PortAudio](http://www.portaudio.com/) | 麦克风录音 | MIT / PortAudio |
+| [NumPy](https://numpy.org/) | 音频数组处理 | BSD-3-Clause |
+| [PyYAML](https://pyyaml.org/) | 配置文件解析 | MIT |
+| [pytest](https://docs.pytest.org/) | 单元测试 | MIT |
+
+模型经 [ModelScope（魔搭社区）](https://modelscope.cn/) 镜像下载（HuggingFace 在国内不可达）。
